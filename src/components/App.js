@@ -6,42 +6,32 @@ class App extends Component {
         super(props);
         this.state = {
             renderBall: false,
-            ballPosition: { left: "0px" } // Initial position
+            posi: 0,
+            ballPosition: { left: "0px" }
         };
-
+        this.renderChoice = this.renderBallOrButton.bind(this);
         this.buttonClickHandler = this.buttonClickHandler.bind(this);
         this.handleKeyDown = this.handleKeyDown.bind(this);
     }
 
-    componentDidMount() {
-        // Add event listener for keydown event
-        document.addEventListener('keydown', this.handleKeyDown);
-    }
-
-    componentWillUnmount() {
-        // Clean up event listener
-        document.removeEventListener('keydown', this.handleKeyDown);
-    }
-
     buttonClickHandler() {
         this.setState({
-            renderBall: true
+            renderBall: true,
+            ballPosition: { left: `${this.state.posi}px` }
         });
+        document.addEventListener('keydown', this.handleKeyDown);
     }
 
     handleKeyDown(event) {
         if (event.key === 'ArrowRight' || event.keyCode === 39) {
-            this.moveBallRight();
+            this.setState((prevState) => {
+                const newPosi = prevState.posi + 5;
+                return {
+                    posi: newPosi,
+                    ballPosition: { left: `${newPosi}px` }
+                };
+            });
         }
-    }
-
-    moveBallRight() {
-        // Get the current left position of the ball and parse it to an integer
-        const currentLeft = parseInt(this.state.ballPosition.left, 10);
-        // Increase the left position by 5px
-        this.setState({
-            ballPosition: { left: `${currentLeft + 5}px` }
-        });
     }
 
     renderBallOrButton() {
@@ -50,6 +40,10 @@ class App extends Component {
         } else {
             return <button className="start" onClick={this.buttonClickHandler}>Start</button>;
         }
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('keydown', this.handleKeyDown);
     }
 
     render() {
